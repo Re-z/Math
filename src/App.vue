@@ -18,11 +18,14 @@ export default {
   methods: {
     changeStateToQuestion () {
       this.state = 'question'
-    }gi
+    }
   }
 }
 </script>
 
 <style lang="sass">
-
+  .wrap
+    max-width: 900px
+    margin: 20px auto
+    text-align: center
 </style>

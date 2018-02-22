@@ -4,7 +4,7 @@
     <div class="btns">
       <button class="btn btn-success"
                     v-for="answer in answers"
-                    @click="handleAnswer"
+                    @click="handleAnswer(answer)"
       >{{ answer }}</button>
 
 
@@ -19,24 +19,31 @@
       return {
         num1: calculateRandomNumber(100, 200),
         num2: calculateRandomNumber(100, 200),
-
       }
     },
     computed: {
-
+      correct() {
+        return this.num1 + this.num2;
+      },
       answers() {
-        let correct = this.num1 + this.num2;
-        let result = [correct];
+        let result = [this.correct];
         for (let i = 0; i < 3; i++) {
-          let t = calculateRandomNumber(correct - 10, correct + 10);
+          let t = calculateRandomNumber(this.correct - 20, this.correct + 20);
           result.push(t);
         }
-        return result;
+        return result.sort(function(){
+          return Math.random() > 0.5;
+        });
       },
     },
     methods: {
-      handleAnswer(){
-
+      handleAnswer(answer){
+        if(answer === this.correct){
+          this.$emit('correctAnswer')
+        }
+        else {
+          this.$emit('wrongAnswer')
+        }
       }
     },
 

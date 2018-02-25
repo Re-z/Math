@@ -6,7 +6,12 @@
       @correctAnswer="handleCorrectAnswer"
       @wrongAnswer="handleWrongAnswer"
     ></question>
-    <message v-else-if="state == 'message'"></message>
+    <message v-else-if="state == 'message'"
+      :title="this.message.title"
+      :className = "this.message.className"
+      :correctAnswer = "this.message.correctAnswer"
+      @messageReaded = "changeStatetoResult"
+    ></message>
     <result v-else-if="state == 'result'"></result>
   </div>
 
@@ -16,18 +21,31 @@ export default {
   name: 'app',
   data () {
     return {
-      state: 'start'
+      state: 'start',
+      message: {
+        title: '',
+        className: '',
+        correctAnswer: ''
+      }
     }
   },
   methods: {
     changeStateToQuestion () {
       this.state = 'question'
     },
-    handleCorrectAnswer() {
-      this.state = "message"
+    changeStatetoResult () {
+      this.state = 'result'
     },
-    handleWrongAnswer(){
-      alert('wrong')
+    handleCorrectAnswer() {
+      this.state = "message";
+      this.message.title = 'Thats correct answer!';
+      this.message.className = 'alert-success'
+    },
+    handleWrongAnswer(msg){
+      this.state = "message";
+      this.message.title = 'Thats wrong answer!';
+      this.message.className = 'alert-warning'
+      this.message.correctAnswer = 'The correct answer is '+ msg
     }
   }
 }

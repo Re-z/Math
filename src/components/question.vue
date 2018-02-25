@@ -42,7 +42,7 @@
           this.$emit('correctAnswer')
         }
         else {
-          this.$emit('wrongAnswer')
+          this.$emit('wrongAnswer', this.correct)
         }
       }
     },

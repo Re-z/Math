@@ -15,10 +15,11 @@
 
 <script>
   export default {
+    props: ['settings'],
     data() {
       return {
-        num1: calculateRandomNumber(100, 200),
-        num2: calculateRandomNumber(100, 200),
+        num1: calculateRandomNumber(this.settings.from, this.settings.to),
+        num2: calculateRandomNumber(this.settings.from, this.settings.to),
       }
     },
     computed: {
@@ -27,8 +28,8 @@
       },
       answers() {
         let result = [this.correct];
-        for (let i = 0; i < 3; i++) {
-          let t = calculateRandomNumber(this.correct - 20, this.correct + 20);
+        for (let i = 0; i < this.settings.variants-1; i++) {
+          let t = calculateRandomNumber(this.correct - this.settings.range, this.correct + this.settings.range);
           result.push(t);
         }
         return result.sort(function(){

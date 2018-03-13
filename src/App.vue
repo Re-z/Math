@@ -1,9 +1,10 @@
 <template>
   <div id="app">
     <h1>Math trainer</h1>
+    <h2>Level: {{level +1}}</h2>
     <hr>
     <div class="progress">
-      <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+      <div class="progress-bar" v-bind:style="progressStyle"></div>
     </div>
     <div id="box">
       <transition name="flip" mode="out-in">
@@ -12,6 +13,7 @@
           v-else-if="state == 'question'"
           @correctAnswer="handleCorrectAnswer"
           @wrongAnswer="handleWrongAnswer"
+          :settings="levels[level]"
         ></question>
         <message v-else-if="state == 'message'"
           :title="this.message.title"
@@ -19,7 +21,14 @@
           :correctAnswer = "this.message.correctAnswer"
           @messageReaded = "changeStatetoResult"
         ></message>
-        <result v-else-if="state == 'result'"></result>
+        <result v-if="state == 'result'"
+              :stats="stats"
+              @repeat="changeStateToQuestion"
+              @nextLevel="increaseLevel"
+        ></result>
+        <congrats v-if="state == 'congrats'"
+                  @returnToStart="changeStateToStart"
+        ></congrats>
       </transition>
     </div>
 
@@ -41,33 +50,88 @@ export default {
         success: 0,
         errors: 0,
       },
-      maxQuestions: 3
+      maxQuestions: 3,
+      level: 0,
+      levels: [
+        {
+          from: 10,
+          to: 40,
+          variants: 2,
+          range: 5,
+        },
+        {
+          from: 100,
+          to: 200,
+          variants: 4,
+          range: 20,
+        },
+        {
+          from: 500,
+          to: 900,
+          variants: 6,
+          range: 40,
+        },
+      ]
     }
   },
   computed: {
     questionsDone() {
       return this.stats.success + this.stats.errors
+    },
+    progressStyle() {
+      return {
+        width: (this.questionsDone / this.maxQuestions * 100) + '%'
+      }
     }
   },
   methods: {
+
+    changeStateToStart() {
+      this.state = 'start';
+      this.resetStats();
+      this.level = 0;
+    },
     changeStateToQuestion () {
-      this.state = 'question'
+      this.state = 'question';
+      this.resetStats()
     },
     changeStatetoResult () {
-      // this.state = 'result'
-      this.state = 'question'
+      if(this.questionsDone < this.maxQuestions) {
+        this.state = 'question'
+      }
+      else {
+        this.state = 'result'
+      }
+    },
+    changeStateToCongrats() {
+      this.state = 'congrats'
     },
     handleCorrectAnswer() {
       this.state = "message";
       this.message.title = 'Thats correct answer!';
-      this.message.className = 'alert-success'
+      this.message.className = 'alert-success';
+      this.stats.success++;
     },
     handleWrongAnswer(msg){
       this.state = "message";
       this.message.title = 'Thats wrong answer!';
       this.message.className = 'alert-warning';
-      this.message.correctAnswer = 'The correct answer is '+ msg
-    }
+      this.message.correctAnswer = 'The correct answer is '+ msg;
+      this.stats.errors++;
+    },
+    increaseLevel() {
+      if(this.level != this.levels.length-1) {
+        this.level++;
+        this.changeStateToQuestion();
+      }
+      else {
+        this.changeStateToCongrats();
+      }
+    },
+    resetStats() {
+      this.stats.success = 0;
+      this.stats.errors = 0;
+    },
   }
 }
 </script>
